@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Chirimen Ambient example</title>
+  </head>
+  <body>
+    <div><span>Total: </span><span id="count">null</span></div>
+    <div><span>Sensor Data: </span><strong id="d1">null</strong></div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="../chirimen-ambient.js"></script>
+    <script>
+      $(function() {
+        var AMBIENT_CHANNEL_ID = '[AMBIENT CHANNEL ID]';
+        var AMBIENT_READ_KEY   = '[AMBIENT READ KEY]';
+        var AMBIENT_WRITE_KEY  = '[AMBIENT WRITE KEY]';
+
+        var amb = new ChirimenAmbient();
+        amb.channel(AMBIENT_CHANNEL_ID, AMBIENT_READ_KEY, AMBIENT_WRITE_KEY);
+
+        window.setInterval(function() {
+          var dummySensorData = Math.floor(Math.random() * Math.floor(20));
+          amb.send({"d1": dummySensorData})
+            .then(function(r) {
+              amb.readLatestOne()
+                .then(function(r) {
+                  console.log(r);
+                  $('#d1').text(r.d1);
+                })
+                .catch(function(e) { console.error(e); });
+            }).catch(function(e) {
+              console.error(e);
+            });
+        }, 10000);
+
+        amb.read({date: '2019-12-08'})
+          .then(function(r) { $('#count').text(r.length); })
+          .catch(function(e) { console.error(e); });
+      });
+    </script>
+  </body>
+</html>
